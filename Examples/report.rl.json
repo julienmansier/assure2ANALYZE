@@ -161,7 +161,7 @@
                     "violations": []
                 },
                 "malware": {
-                    "count": 0,
+                    "count": 1,
                     "final": false,
                     "label": "No evidence of malware inclusion",
                     "priority": null,

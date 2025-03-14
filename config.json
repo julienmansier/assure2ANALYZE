@@ -1,5 +1,6 @@
 {
     "malware": true,
+    "suspect": true,
     "vulnThreshold": 6,
     "vulnExists": true,
     "behaviors":["BH12179"]
