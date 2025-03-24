@@ -1,7 +1,5 @@
 import argparse
 import json
-import csv
-import re
 
 checkMalware = False
 checkSuspect = False
@@ -32,13 +30,30 @@ def process_config(json_file):
 
 
 
-def process_vulns(vuln_file):
+def process_vulns(report_file, vuln_file):
+    global findings
     try:
-        data = json.load(vuln_file)
+        data = json.load(report_file)
+        vuln = json.load(vuln_file)
         print(f"Successfully loaded the Vulns data")
 
-        ##for x in data:
-
+        numVuln=data["report"]["metadata"]["assessments"]["vulnerabilities"]["count"]
+        if numVuln == 0:
+            print("No vulnerabilities detected!")
+        else:
+            print("Vulnerabilities detected!")
+            for item in vuln:
+                temp = {}
+                if item["cvss_score"] > vulnThreshold and len(item["detections"]) > 0:
+                    temp["type"]="vulnerability"
+                    temp["name"]=item["cve"]
+                    temp["location"]=item["detections"]
+                    findings["findings"].append(temp)
+                elif vulnExists and "YES" in item["exploitable"] and len(item["detections"]) > 0:
+                    temp["type"]="vulnerability"
+                    temp["name"]=item["cve"]
+                    temp["location"]=item["detections"]
+                    findings["findings"].append(temp)
 
 
     except json.JSONDecodeError:
@@ -100,7 +115,7 @@ def main():
     process_config(args.config)
 
     ## Process the CVEs
-    process_vulns(args.vulns)
+    process_vulns(args.report,args.vulns)
     
     ## Process the report file
     process_malware(args.report, args.malware)
