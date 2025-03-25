@@ -12,7 +12,7 @@ findings={}
 def process_config(json_file):
     global checkMalware, checkSuspect, vulnExists, vulnThreshold, behaviors, findings
     try:
-        data = json.load(json_file)
+        data = json_file
         findings["config"]=data
         findings["findings"]=[]
         print(f"Successfully loaded Config data")
@@ -33,8 +33,9 @@ def process_config(json_file):
 def process_vulns(report_file, vuln_file):
     global findings
     try:
-        data = json.load(report_file)
-        vuln = json.load(vuln_file)
+        data = report_file
+        print(f"Successfully loaded the Report data")
+        vuln = vuln_file
         print(f"Successfully loaded the Vulns data")
 
         numVuln=data["report"]["metadata"]["assessments"]["vulnerabilities"]["count"]
@@ -71,9 +72,10 @@ def process_malware(report_file, malware_file):
     global findings
 
     try:
-        data = json.load(report_file)
-        mal = json.load(malware_file)
+        data = report_file
         print(f"Successfully loaded the Report data")
+        mal = malware_file
+        print(f"Successfully loaded the Malware data")
     
         ##Check for Malware
         if checkMalware:
@@ -86,14 +88,16 @@ def process_malware(report_file, malware_file):
                 
                 for item in mal:
                     temp = {}
-                    if item["malware"]: ## Check if malware is TRUE
+                    if item["malware_name"] and not item["suspected_malware"]: ## Check if malware is TRUE
                         temp["type"]="malware"
-                        temp["name"]=item["malwareName"]
+                        temp["name"]=item["malware_name"]
+                        temp["suspect"] = False
                         temp["location"]=item["detections"]
                         findings["findings"].append(temp)
-                    elif  checkSuspect and  item["suspect"]: ## Check if config has suspect set to TRUE
+                    elif  checkSuspect and  item["suspected_malware"]: ## Check if config has suspect set to TRUE
                         temp["type"]="suspected malware"
-                        temp["name"]=item["malwareName"]
+                        temp["name"]=item["malware_name"]
+                        temp["suspect"] = True
                         temp["location"]=item["detections"]
                         findings["findings"].append(temp)
         else:
@@ -114,15 +118,20 @@ def main():
     parser.add_argument('-m', '--malware', type=argparse.FileType('r'), required=True, help="Input Malware JSON file")
     args = parser.parse_args()
 
-        
+    configContent = json.load(args.config)
+    reportContent = json.load(args.report)
+    vulnsContent = json.load(args.vulns)
+    malwareContent = json.load(args.malware)
+
+
     ## Process the config file
-    process_config(args.config)
+    process_config(configContent)
 
     ## Process the CVEs
-    process_vulns(args.report,args.vulns)
+    process_vulns(reportContent, vulnsContent)
     
     ## Process the report file
-    process_malware(args.report, args.malware)
+    process_malware(reportContent, malwareContent)
 
 
     args.report.close()

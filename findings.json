@@ -1,7 +1,7 @@
 {
   "config": {
     "malware": true,
-    "suspect": true,
+    "suspect": false,
     "vulnThreshold": 6,
     "vulnExists": true,
     "behaviors": [
@@ -923,6 +923,31 @@
         "unpacked_files/0/solr-8.10.0/server/lib/metrics-jetty9-4.1.5.jar <- via org.eclipse.jetty:jetty-server/9.4.27.v20200227 (package)",
         "unpacked_files/0/solr-8.10.0/server/lib/jetty-server-9.4.41.v20210516.jar",
         "unpacked_files/0/solr-8.10.0/server/lib/jetty-security-9.4.41.v20210516.jar <- via org.eclipse.jetty:jetty-server/9.4.41.v20210516 (package)"
+      ]
+    },
+    {
+      "type": "malware",
+      "name": "Archive-JAR.Trojan.Strrat",
+      "suspect": false,
+      "location": [
+        "WEB-INF/lib/strrat-1.0.0.jar/carLambo/FirstRun.class"
+      ]
+    },
+    {
+      "type": "malware",
+      "name": "ByteCode-JAVA.Exploit.Banload",
+      "suspect": false,
+      "location": [
+        "WEB-INF/lib/strrat-1.0.0.jar/carLambo/WzodNXIRgeBkyABvwwufd.class",
+        "WEB-INF/lib/strrat-1.0.0.jar/carLambo/tfqIDcmEmgfVqfTILxYKD.class"
+      ]
+    },
+    {
+      "type": "malware",
+      "name": "ByteCode-JAVA.Trojan.StrRat",
+      "suspect": false,
+      "location": [
+        "WEB-INF/lib/strrat-1.0.0.jar"
       ]
     }
   ]
