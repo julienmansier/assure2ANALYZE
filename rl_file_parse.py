@@ -44,18 +44,22 @@ def process_vulns(report_file, vuln_file):
             print("Vulnerabilities detected!")
             for item in vuln:
                 temp = {}
-                if item["cvss_score"] > vulnThreshold and len(item["detections"]) > 0:
+                if item["cve_score"] > vulnThreshold and item["detections"]:
                     temp["type"]="vulnerability"
-                    temp["name"]=item["cve"]
+                    temp["name"]=item["cve_name"]
+                    temp["severity"] = item["cve_score"]
+                    temp["description"] = item["description"]
                     temp["location"]=item["detections"]
                     findings["findings"].append(temp)
-                elif vulnExists and "YES" in item["exploitable"] and len(item["detections"]) > 0:
+                elif vulnExists and "YES" in item["exploitable"] and item["detections"]:
                     temp["type"]="vulnerability"
-                    temp["name"]=item["cve"]
+                    temp["name"]=item["cve_name"]
+                    temp["severity"] = item["cve_score"]
+                    temp["description"] = item["description"]
                     temp["location"]=item["detections"]
                     findings["findings"].append(temp)
 
-
+        print("Done processing vulns!")
     except json.JSONDecodeError:
         print(f"Error: Invalid JSON format in the Report file")
     except Exception as e:
