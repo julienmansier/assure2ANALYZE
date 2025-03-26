@@ -109,6 +109,24 @@ def process_malware(report_file, malware_file):
         print(f"An error occurred while processing Report JSON: {str(e)}")
 
 
+def process_behaviors(report_file, behavior_file):
+    global behaviors
+
+    if len(behaviors) > 0:
+        for behavior in behaviors:
+            temp = {}
+            search = next((item for item in behavior_file if item["bhcode"] == behavior), None)
+
+            if search is not None:
+                temp["type"] = "behavior"
+                temp["name"] = behavior
+                temp["description"] = search["behavior"] + " => " + search["explaination"]
+                temp["locations"] = search["detections"]
+                findings["findings"].append(temp)
+    else:
+        return {}
+
+
 
 def main():
     parser = argparse.ArgumentParser(description="Process needed files")
@@ -116,12 +134,14 @@ def main():
     parser.add_argument('-c', '--config', type=argparse.FileType('r'), required=True, help="Input Config JSON file")
     parser.add_argument('-v', '--vulns', type=argparse.FileType('r'), required=True, help="Input CVE JSON file")
     parser.add_argument('-m', '--malware', type=argparse.FileType('r'), required=True, help="Input Malware JSON file")
+    parser.add_argument('-b', '--behavior', type=argparse.FileType('r'), required=True, help="Input Malware JSON file")
     args = parser.parse_args()
 
     configContent = json.load(args.config)
     reportContent = json.load(args.report)
     vulnsContent = json.load(args.vulns)
     malwareContent = json.load(args.malware)
+    behaviorContent = json.load(args.behavior)
 
 
     ## Process the config file
@@ -130,14 +150,18 @@ def main():
     ## Process the CVEs
     process_vulns(reportContent, vulnsContent)
     
-    ## Process the report file
+    ## Process Malware
     process_malware(reportContent, malwareContent)
+
+    # Process Behaviors
+    process_behaviors(reportContent, behaviorContent)
 
 
     args.report.close()
     args.config.close()
     args.vulns.close()
     args.malware.close()
+    args.behavior.close()
 
     outfile = open("findings.json", "w")
     outfile.write(json.dumps(findings))
